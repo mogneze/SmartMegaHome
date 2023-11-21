@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LogInActivity"
+    tools:context=".RegisterActivity"
     android:background="@drawable/login_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -52,15 +52,30 @@
             app:layout_constraintTop_toBottomOf="@+id/textSmartHome">
 
             <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Имя пользователя"
+                android:layout_marginTop="6dp"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/regUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"/>
+
+            <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Электронная почта"
                 android:textStyle="bold"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="12dp"/>
 
             <EditText
-                android:id="@+id/logEmail"
+                android:id="@+id/regEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -75,7 +90,7 @@
                 android:textStyle="bold"/>
 
             <EditText
-                android:id="@+id/logPassword"
+                android:id="@+id/regPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -83,11 +98,11 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/logBtnLogIn"
+            android:id="@+id/regBtnRegister"
             android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="100dp"
-            android:text="Войти"
+            android:text="Регистрация"
             android:background="@drawable/rounded_block"
             android:backgroundTint="#974E4F"
             android:textColor="@color/white"
@@ -100,11 +115,11 @@
             app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
         <Button
-            android:id="@+id/logBtnRegister"
+            android:id="@+id/regBtnLogIn"
             android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Регистрация"
+            android:text="Войти"
             android:textColor="@color/white"
             android:textStyle="bold"
             android:textAllCaps="false"
@@ -113,7 +128,7 @@
             android:backgroundTint="@color/grey"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logBtnLogIn" />
+            app:layout_constraintTop_toBottomOf="@+id/regBtnRegister" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

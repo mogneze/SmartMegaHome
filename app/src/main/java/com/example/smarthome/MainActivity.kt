@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         roomsList.clear()
         lifecycleScope.launch {
             try{
-                val rooms = supabaseClient.postgrest["Room"].select().body.toString()//.decodeSingle<Client>()
+                val rooms = supabaseClient.postgrest["Rooms"].select().body.toString()//.decodeSingle<Client>()
 
                 val buf = StringBuilder()
                 buf.append(rooms).append("\n");
@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
             catch (e: Exception){
                 Log.e("!!!!!!!!!!!!", e.toString())
             }
-
         }
     }
 }
