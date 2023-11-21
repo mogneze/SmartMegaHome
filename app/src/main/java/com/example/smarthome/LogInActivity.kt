@@ -49,7 +49,7 @@ class LogInActivity : AppCompatActivity() {
         }
         val btnRegister: Button = findViewById(R.id.logBtnRegister)
         btnRegister.setOnClickListener{
-            startActivity(Intent(this, RegisterActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish();
         }
     }
