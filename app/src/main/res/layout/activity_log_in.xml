@@ -85,7 +85,7 @@
         <Button
             android:id="@+id/logBtnLogIn"
             android:layout_width="260dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginBottom="100dp"
             android:text="Войти"
             android:background="@drawable/rounded_block"
@@ -102,7 +102,7 @@
         <Button
             android:id="@+id/logBtnRegister"
             android:layout_width="260dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginTop="32dp"
             android:text="Регистрация"
             android:textColor="@color/white"
