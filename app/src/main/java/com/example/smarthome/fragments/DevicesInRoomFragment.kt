@@ -1,60 +1,90 @@
 package com.example.smarthome.fragments
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.smarthome.activities.DetailsActivity
+import com.example.smarthome.Device
+import com.example.smarthome.adapters.DevicesAdapter
 import com.example.smarthome.R
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.launch
+import org.json.JSONArray
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DevicesInRoomFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+val deviceList: ArrayList<Device> = ArrayList()
+val supabaseClient = createSupabaseClient(
+    supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
+    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttbWtxa2hzZ3B2eXlqdXJxc3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA0NjkyNzIsImV4cCI6MjAxNjA0NTI3Mn0.MovxaxcIm0z1cR6xuWpwvHgk1Y5i-q5AEKBqkm_Q304"
+) {
+    install(GoTrue)
+    install(Postgrest)
+}
 class DevicesInRoomFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
+    private val adapter = DevicesAdapter(deviceList, object : DevicesAdapter.ItemClickListener{
+        override fun onItemClick(position: Int) {
+            val bundle = Bundle()
+            bundle.putString("page", "device")
+            val intent = Intent(activity, DetailsActivity::class.java)
+            intent.putExtras(bundle)
+            startActivity(intent)
+            //DetailsActivity().replaceFragment(AddRoomFragment())
+            //val bundle = Bundle()
+            //findNavController(R.id.nav_graph).navigate(R.id.deviceFragment, bundle)
+        }
+    })
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val recycler: RecyclerView = view.findViewById(R.id.devicesRecycle)
+        recycler.layoutManager = GridLayoutManager(context, 2)
+        recycler.adapter = adapter
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_devices_in_room, container, false)
-    }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DevicesInRoom.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DevicesInRoomFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        deviceList.clear()
+        lifecycleScope.launch {
+            try{
+                val devices = supabaseClient.postgrest["Devices"].select().body.toString()//.decodeSingle<Client>()
+
+                val buf = StringBuilder()
+                buf.append(devices).append("\n");
+                val root = JSONArray(buf.toString())
+
+                for(i in 0..<root.length()){
+                    val obj = root.getJSONObject(i)
+                    val id = obj.getInt("id")
+                    val roomId = obj.getInt("room_id")
+                    val name = obj.getString("name")
+                    val type = obj.getString("type")
+                    //val isTurned = obj.getBoolean("isTurnedOn")
+/*                    val param1 = obj.getInt("param")
+                    val param2 = obj.getInt("param2")*/
+                    deviceList.add(Device(id, roomId, name, type, true, 1, 2))
                 }
+                adapter.notifyDataSetChanged()
             }
+            catch (e: Exception){
+                Log.e("!!!!!!!!!!!!", e.toString())
+            }
+        }
+        return inflater.inflate(R.layout.fragment_devices_in_room, container, false)
+
     }
 }

@@ -1,10 +1,12 @@
-package com.example.smarthome
+package com.example.smarthome.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.smarthome.R
+import com.example.smarthome.Room
 
 class RoomsAdapter(private val list: ArrayList<Room>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<RoomsAdapter.ViewHolder>() {
     interface ItemClickListener {
@@ -17,7 +19,7 @@ class RoomsAdapter(private val list: ArrayList<Room>, private val itemClickListe
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.room_item, parent, false)
         return ViewHolder(itemView)
     }
-    override fun onBindViewHolder(holder: RoomsAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentRoom: Room = list[position]
         holder.roomName.text = currentRoom.name
         holder.itemView.setOnClickListener(){

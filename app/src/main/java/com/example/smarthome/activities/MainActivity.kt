@@ -1,21 +1,19 @@
-package com.example.smarthome
+package com.example.smarthome.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.ImageButton
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.smarthome.fragments.DevicesInRoomFragment
+import com.example.smarthome.R
+import com.example.smarthome.Room
+import com.example.smarthome.adapters.RoomsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -77,7 +75,8 @@ class MainActivity : AppCompatActivity() {
                     val obj = root.getJSONObject(i)
                     val id = obj.getInt("id")
                     val name = obj.getString("name")
-                    roomsList.add(Room(id, name))
+                    val type = obj.getString("type")
+                    roomsList.add(Room(id, name, type))
                 }
                 adapter.notifyDataSetChanged()
             }
