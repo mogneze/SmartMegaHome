@@ -53,12 +53,14 @@ class DevicesInRoomFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         deviceList.clear()
+        val bundle = arguments
+        val roomId = bundle!!.getInt("roomId")
         lifecycleScope.launch {
             try{
                 val devices = supabaseClient.postgrest["Devices"].select(){
                     //фильтр по id комнаты
+                    eq("room_id", roomId)
                 }.body.toString()//.decodeSingle<Client>()
 
                 val buf = StringBuilder()

@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
@@ -37,6 +38,7 @@ class LogInActivity : AppCompatActivity() {
             if(textEmail.text.toString() != "" && textPassword.text.toString() != "") {
                 lifecycleScope.launch {
                     try {
+                        //supabaseClient.gotrue.logout(scope = LogoutScope.GLOBAL)
                         supabaseClient.gotrue.loginWith(Email) {
                             email = textEmail.text.toString()
                             password = textPassword.text.toString()

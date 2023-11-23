@@ -28,6 +28,16 @@ class DevicesAdapter(private val list: ArrayList<Device>, private val itemClickL
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentDevice: Device = list[position]
         holder.deviceName.text = currentDevice.name
+        holder.deviceParam1.text = currentDevice.param1.toString()
+        holder.deviceParam2.text = currentDevice.param2.toString()
+        holder.deviceSwitch.isChecked = currentDevice.isTurnedOn
+        when(currentDevice.type){
+            "light" -> holder.deviceImage.setImageResource(R.drawable.bulb_blue)
+            "fan" -> holder.deviceImage.setImageResource(R.drawable.fan_blue)
+            "hood" -> holder.deviceImage.setImageResource(R.drawable.hood_blue)
+            "temperature" -> holder.deviceImage.setImageResource(R.drawable.thermo_blue)
+            "conditioner" -> holder.deviceImage.setImageResource(R.drawable.condi_blue)
+        }
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)
         }

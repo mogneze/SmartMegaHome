@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.smarthome.R
 import com.example.smarthome.fragments.AddRoomFragment
 import com.example.smarthome.fragments.DeviceFragment
+import com.example.smarthome.fragments.DeviceSettingsFragment
 import com.example.smarthome.fragments.DevicesInRoomFragment
 
 class DetailsActivity : AppCompatActivity() {
@@ -19,6 +20,8 @@ class DetailsActivity : AppCompatActivity() {
         val bundle = intent.extras
         var page: String? = null
         page = bundle!!.getString("page", "default")
+
+        //val roomId = intent.getIntExtra("roomId", 0)
         val pageName: TextView = findViewById(R.id.textPageTitle)
         when (page) {
             "addRoom" -> {
@@ -29,8 +32,10 @@ class DetailsActivity : AppCompatActivity() {
                 //findNavController(R.id.nav_graph).navigate(R.id.addRoomFragment, bundle)
             }
             "devicesInRoom" -> {
+                val fr = DevicesInRoomFragment()
+                fr.arguments = bundle
                 pageName.text = "Устройства в ..."
-                replaceFragment(DevicesInRoomFragment())
+                replaceFragment(fr)
             }
             "addDevice" -> {
                 pageName.text = "Добавить устройство"
@@ -38,7 +43,7 @@ class DetailsActivity : AppCompatActivity() {
             }
             "device" -> {
                 pageName.text = "Устройство"
-                replaceFragment(DeviceFragment())
+                replaceFragment(DeviceSettingsFragment())
             }
         }
 

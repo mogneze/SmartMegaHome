@@ -1,5 +1,6 @@
 package com.example.smarthome.activities
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -32,10 +33,12 @@ val supabaseClient = createSupabaseClient(
     install(Postgrest)
 }
 class MainActivity : AppCompatActivity() {
+    val act: Activity = this
     private val adapter = RoomsAdapter(roomsList, object : RoomsAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
             bundle.putString("page", "devicesInRoom")
+            bundle.putInt("roomId", roomsList[position].id)
             intent = Intent(applicationContext, DetailsActivity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
@@ -44,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        loadRooms()
+        val act: Activity = this;
 
         val btnProfile: ImageButton = findViewById(R.id.btnSettings)
         btnProfile.setOnClickListener{
@@ -63,17 +69,20 @@ class MainActivity : AppCompatActivity() {
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
     }
-    override fun onResume() {
-        super.onResume()
+    private fun loadRooms(){
         roomsList.clear()
         lifecycleScope.launch {
             try{
                 val addressText: TextView = findViewById(R.id.textAddress)
                 val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
 
-                addressText.text = supabaseClient.postgrest["Users"].select(columns = Columns.list("address")){
+                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("address")){
                     eq("id", user.id)
                 }.body.toString()
+                val array = JSONArray(n)
+                val obj = array.getJSONObject(0)
+                val address = obj.getString("address")
+                addressText.text = address
 
                 val rooms = supabaseClient.postgrest["Rooms"].select(){
                     eq("user_id", user.id)
@@ -99,10 +108,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        lifecycleScope.launch {
-            supabaseClient.gotrue.logout(LogoutScope.GLOBAL)
-        }
-    }
 }

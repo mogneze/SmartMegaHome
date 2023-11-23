@@ -35,7 +35,7 @@ class RegisterActivity : AppCompatActivity() {
                     val userAdd = User(user.id, textName.text.toString(), "")
                     supabaseClient.postgrest["Users"].insert(userAdd)
 
-                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    startActivity(Intent(applicationContext, AddAddressActivity::class.java))
                     finish()
                 }
                 catch (e: Exception){
