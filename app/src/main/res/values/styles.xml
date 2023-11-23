@@ -3,7 +3,7 @@
     <style name="EditTextStyle" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/light_grey</item>
         <item name="android:paddingStart">10dp</item>
-        <item name="background">@drawable/rounded_edit_text</item>
+        <item name="background">@drawable/rounded_edit_text1</item>
         <item name="height">44dp</item>
     </style>
 </resources>

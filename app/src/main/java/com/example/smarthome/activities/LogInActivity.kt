@@ -33,6 +33,7 @@ class LogInActivity : AppCompatActivity() {
 
         val btnLogIn: Button = findViewById(R.id.logBtnLogIn)
         btnLogIn.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java)
             if(textEmail.text.toString() != "" && textPassword.text.toString() != "") {
                 lifecycleScope.launch {
                     try {
@@ -40,17 +41,18 @@ class LogInActivity : AppCompatActivity() {
                             email = textEmail.text.toString()
                             password = textPassword.text.toString()
                         }
+                        startActivity(intent)
+                        finish();
                     } catch (e: Exception) {
                         Log.e("!!!!", e.toString())
+
                     }
                 }
             }
-            //startActivity(Intent(this, MainActivity::class.java))
-            //finish();
         }
         val btnRegister: Button = findViewById(R.id.logBtnRegister)
         btnRegister.setOnClickListener{
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish();
         }
     }

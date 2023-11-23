@@ -42,10 +42,6 @@ class DevicesInRoomFragment : Fragment() {
             //findNavController(R.id.nav_graph).navigate(R.id.deviceFragment, bundle)
         }
     })
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -61,7 +57,9 @@ class DevicesInRoomFragment : Fragment() {
         deviceList.clear()
         lifecycleScope.launch {
             try{
-                val devices = supabaseClient.postgrest["Devices"].select().body.toString()//.decodeSingle<Client>()
+                val devices = supabaseClient.postgrest["Devices"].select(){
+                    //фильтр по id комнаты
+                }.body.toString()//.decodeSingle<Client>()
 
                 val buf = StringBuilder()
                 buf.append(devices).append("\n");

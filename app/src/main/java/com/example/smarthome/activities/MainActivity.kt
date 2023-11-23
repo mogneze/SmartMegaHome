@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +15,11 @@ import com.example.smarthome.adapters.RoomsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
@@ -28,7 +32,6 @@ val supabaseClient = createSupabaseClient(
     install(Postgrest)
 }
 class MainActivity : AppCompatActivity() {
-
     private val adapter = RoomsAdapter(roomsList, object : RoomsAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
@@ -65,11 +68,21 @@ class MainActivity : AppCompatActivity() {
         roomsList.clear()
         lifecycleScope.launch {
             try{
-                val rooms = supabaseClient.postgrest["Rooms"].select().body.toString()//.decodeSingle<Client>()
+                val addressText: TextView = findViewById(R.id.textAddress)
+                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+
+                addressText.text = supabaseClient.postgrest["Users"].select(columns = Columns.list("address")){
+                    eq("id", user.id)
+                }.body.toString()
+
+                val rooms = supabaseClient.postgrest["Rooms"].select(){
+                    eq("user_id", user.id)
+                }.body.toString()//.decodeSingle<Client>()
 
                 val buf = StringBuilder()
                 buf.append(rooms).append("\n");
                 val root = JSONArray(buf.toString())
+
 
                 for(i in 0..<root.length()){
                     val obj = root.getJSONObject(i)
@@ -83,6 +96,13 @@ class MainActivity : AppCompatActivity() {
             catch (e: Exception){
                 Log.e("!!!!!!!!!!!!", e.toString())
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycleScope.launch {
+            supabaseClient.gotrue.logout(LogoutScope.GLOBAL)
         }
     }
 }
