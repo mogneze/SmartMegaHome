@@ -14,6 +14,7 @@ import com.example.smarthome.activities.DetailsActivity
 import com.example.smarthome.Device
 import com.example.smarthome.adapters.DevicesAdapter
 import com.example.smarthome.R
+import com.example.smarthome.activities.roomsList
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
@@ -34,6 +35,7 @@ class DevicesInRoomFragment : Fragment() {
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
             bundle.putString("page", "device")
+            bundle.putString("deviceName", deviceList[position].name)
             val intent = Intent(activity, DetailsActivity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
@@ -85,6 +87,5 @@ class DevicesInRoomFragment : Fragment() {
             }
         }
         return inflater.inflate(R.layout.fragment_devices_in_room, container, false)
-
     }
 }

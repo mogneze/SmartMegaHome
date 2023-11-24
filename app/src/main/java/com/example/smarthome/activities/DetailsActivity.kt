@@ -20,6 +20,7 @@ class DetailsActivity : AppCompatActivity() {
         val bundle = intent.extras
         var page: String? = null
         page = bundle!!.getString("page", "default")
+        val roomName = bundle.getString("roomName", "default")
 
         //val roomId = intent.getIntExtra("roomId", 0)
         val pageName: TextView = findViewById(R.id.textPageTitle)
@@ -34,7 +35,7 @@ class DetailsActivity : AppCompatActivity() {
             "devicesInRoom" -> {
                 val fr = DevicesInRoomFragment()
                 fr.arguments = bundle
-                pageName.text = "Устройства в ..."
+                pageName.text = "Устройства в $roomName"
                 replaceFragment(fr)
             }
             "addDevice" -> {
@@ -42,8 +43,10 @@ class DetailsActivity : AppCompatActivity() {
                 //replaceFragment(DevicesInRoomFragment())
             }
             "device" -> {
+                val fr = DeviceSettingsFragment()
+                fr.arguments = bundle
                 pageName.text = "Устройство"
-                replaceFragment(DeviceSettingsFragment())
+                replaceFragment(fr)
             }
         }
 

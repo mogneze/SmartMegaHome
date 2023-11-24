@@ -1,17 +1,23 @@
 package com.example.smarthome.adapters
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smarthome.R
 import com.example.smarthome.Room
+import io.ktor.client.engine.callContext
 
 class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<RoomChAdapter.ViewHolder>() {
     interface ItemClickListener {
-        fun onItemClick(position: Int)
+        fun onItemClick(position: Int){
+
+        }
     }
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val roomImage: ImageButton = itemView.findViewById(R.id.roomImageCh)
@@ -34,6 +40,8 @@ class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickLis
         }
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)
+            //holder.roomImage.
+            // ААААААААААААААААААА БЛЯТЬ
         }
     }
     override fun getItemCount() = list.size

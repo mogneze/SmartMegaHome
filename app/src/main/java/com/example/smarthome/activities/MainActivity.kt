@@ -4,12 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.smarthome.R
 import com.example.smarthome.Room
 import com.example.smarthome.adapters.RoomsAdapter
@@ -24,6 +26,7 @@ import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
+private lateinit var refresher: SwipeRefreshLayout
 val roomsList: ArrayList<Room> = ArrayList()
 val supabaseClient = createSupabaseClient(
     supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity() {
             val bundle = Bundle()
             bundle.putString("page", "devicesInRoom")
             bundle.putInt("roomId", roomsList[position].id)
+            bundle.putString("roomName", roomsList[position].name)
             intent = Intent(applicationContext, DetailsActivity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
@@ -48,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        loadRooms()
+        loadData()
         val act: Activity = this;
 
         val btnProfile: ImageButton = findViewById(R.id.btnSettings)
@@ -68,9 +72,14 @@ class MainActivity : AppCompatActivity() {
         val recycler: RecyclerView = findViewById(R.id.recyclerRooms)
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
+
+        refresher= findViewById(R.id.roomsRefresher)
+        refresher.setOnRefreshListener {
+            loadData()
+        }
     }
-    private fun loadRooms(){
-        roomsList.clear()
+    private fun loadData(){
+        //roomsList.clear()
         lifecycleScope.launch {
             try{
                 val addressText: TextView = findViewById(R.id.textAddress)
@@ -79,6 +88,7 @@ class MainActivity : AppCompatActivity() {
                 val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("address")){
                     eq("id", user.id)
                 }.body.toString()
+
                 val array = JSONArray(n)
                 val obj = array.getJSONObject(0)
                 val address = obj.getString("address")
@@ -92,20 +102,20 @@ class MainActivity : AppCompatActivity() {
                 buf.append(rooms).append("\n");
                 val root = JSONArray(buf.toString())
 
-
                 for(i in 0..<root.length()){
                     val obj = root.getJSONObject(i)
                     val id = obj.getInt("id")
                     val name = obj.getString("name")
                     val type = obj.getString("type")
-                    roomsList.add(Room(id, name, type))
+                    val room = Room(id, name, type)
+                    if(!roomsList.contains(room)) roomsList.add(room)
                 }
                 adapter.notifyDataSetChanged()
+                refresher.isRefreshing = false
             }
             catch (e: Exception){
                 Log.e("!!!!!!!!!!!!", e.toString())
             }
         }
     }
-
 }
