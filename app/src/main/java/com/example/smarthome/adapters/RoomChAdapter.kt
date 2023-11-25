@@ -1,24 +1,24 @@
 package com.example.smarthome.adapters
 
-import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smarthome.R
 import com.example.smarthome.Room
-import io.ktor.client.engine.callContext
 
 class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<RoomChAdapter.ViewHolder>() {
     interface ItemClickListener {
         fun onItemClick(position: Int){
-
         }
     }
+
+    @ColorInt
+    val MAGENTA = -0xffff01
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val roomImage: ImageButton = itemView.findViewById(R.id.roomImageCh)
         val roomName: TextView = itemView.findViewById(R.id.textRoomNameCh)
@@ -34,12 +34,13 @@ class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickLis
             "living_room" -> holder.roomImage.setImageResource(R.drawable.livingroom_white)
             "kitchen" -> holder.roomImage.setImageResource(R.drawable.kitchen_white)
             "bathroom" -> holder.roomImage.setImageResource(R.drawable.bathroom_white)
-            "bedroom" -> holder.roomImage.setImageResource(R.drawable.bedroom_white)
             "office" -> holder.roomImage.setImageResource(R.drawable.office_white)
+            "bedroom" -> holder.roomImage.setImageResource(R.drawable.bedroom_white)
             "hall" -> holder.roomImage.setImageResource(R.drawable.hall_white)
         }
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)
+            holder.roomName.setTextColor(Color.BLUE)
             //holder.roomImage.
             // ААААААААААААААААААА БЛЯТЬ
         }

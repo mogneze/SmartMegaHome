@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class AddRoomFragment : Fragment() {
     private val roomsList: ArrayList<Room> = ArrayList()
-    lateinit var roomType: String
+    var roomType: String = ""
     private val adapter = RoomChAdapter(roomsList, object : RoomChAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
             Toast.makeText(context, roomsList[position].type, Toast.LENGTH_SHORT).show()
@@ -37,17 +37,7 @@ class AddRoomFragment : Fragment() {
         val roomName: EditText = view.findViewById(R.id.textRoomName)
         val btnAddRoom: Button = view.findViewById(R.id.btnSaveRoom)
         btnAddRoom.setOnClickListener {
-            lifecycleScope.launch {
-                try {
-                    val user = com.example.smarthome.activities.supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-                    val room = RoomAdd(user.id, roomName.text.toString(), roomType)
-                    com.example.smarthome.activities.supabaseClient.postgrest["Rooms"].insert(room)
-
-                    Toast.makeText(context, "Сохранено", Toast.LENGTH_SHORT).show()
-                    activity?.finish()
-                }catch (e: Exception){
-                    Log.e("error", e.toString())}
-            }
+            addRoom(roomName)
         }
 
         roomsList.add(Room(0, "Гостиная", "living_room"))
@@ -60,6 +50,28 @@ class AddRoomFragment : Fragment() {
         val recycler: RecyclerView = view.findViewById(R.id.chooseRoomRecycle)
         recycler.layoutManager = GridLayoutManager(context, 3)
         recycler.adapter = adapter
+    }
+    private fun addRoom(roomName: EditText){
+        if(roomName.text.toString() == ""){
+            Toast.makeText(context, "Введите название", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if(roomType == ""){
+            Toast.makeText(context, "Выберите тип комнаты", Toast.LENGTH_SHORT).show()
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                val user = com.example.smarthome.activities.supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+                val room = RoomAdd(user.id, roomName.text.toString(), roomType)
+                com.example.smarthome.activities.supabaseClient.postgrest["Rooms"].insert(room)
+                Toast.makeText(context, "Сохранено", Toast.LENGTH_SHORT).show()
+                activity?.finish()
+            } catch (e: Exception) {
+                Log.e("error", e.toString())
+                Toast.makeText(context, "ашибка: $e", Toast.LENGTH_LONG).show()
+            }
+        }
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

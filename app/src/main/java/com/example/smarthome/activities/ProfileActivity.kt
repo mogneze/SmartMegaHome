@@ -28,17 +28,20 @@ class ProfileActivity : AppCompatActivity() {
         val emailET: EditText = findViewById(R.id.profileEmailText)
         val addressET: EditText = findViewById(R.id.profileAddressText)
         lifecycleScope.launch {
-            val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+            try {
+                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
 
-            val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name", "address")){
-                eq("id", user.id)
-            }.body.toString()
-            val array = JSONArray(n)
-            val obj = array.getJSONObject(0)
-            val username = obj.getString("name")
-            val address = obj.getString("address")
-            usernameET.setText(username)
-            addressET.setText(address)
+                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name","address")) {
+                    eq("id", user.id)
+                }.body.toString()
+                var array = JSONArray(n)
+                var obj = array.getJSONObject(0)
+                val username = obj.getString("name")
+                val address = obj.getString("address")
+                usernameET.setText(username)
+                addressET.setText(address)
+                emailET.setText(user.email)
+            }catch (e: Exception){Log.e("error", e.toString())}
         }
 
         val btnBack: ImageButton = findViewById(R.id.btnBackFromProfile)
@@ -50,12 +53,15 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             lifecycleScope.launch {
                 try {
-                    val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+                    var user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
                     supabaseClient.postgrest["Users"].update({
                         set("address", addressET.text.toString())
                         set("name", usernameET.text.toString())
                     }) {
                         eq("id", user.id)
+                    }
+                    user = supabaseClient.gotrue.modifyUser {
+                        email = emailET.text.toString()
                     }
                     Toast.makeText(applicationContext, "Изменения сохранены", Toast.LENGTH_SHORT).show()
                 }catch (e: Exception){Log.e("error", e.toString())}

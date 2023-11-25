@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
@@ -24,7 +26,6 @@ class LogInActivity : AppCompatActivity() {
         install(GoTrue)
         install(Postgrest)
     }
-    val goTrue = supabaseClient.gotrue;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
@@ -38,19 +39,21 @@ class LogInActivity : AppCompatActivity() {
             if(textEmail.text.toString() != "" && textPassword.text.toString() != "") {
                 lifecycleScope.launch {
                     try {
-                        //supabaseClient.gotrue.logout(scope = LogoutScope.GLOBAL)
                         supabaseClient.gotrue.loginWith(Email) {
                             email = textEmail.text.toString()
                             password = textPassword.text.toString()
                         }
                         startActivity(intent)
                         finish();
-                    } catch (e: Exception) {
+                    } catch (e: BadRequestRestException){
+                        Toast.makeText(applicationContext, "Неправильный логин или пароль", Toast.LENGTH_SHORT).show()
+                    }
+                    catch (e: Exception) {
                         Log.e("!!!!", e.toString())
-
                     }
                 }
             }
+            else Toast.makeText(applicationContext, "Заполните все поля", Toast.LENGTH_SHORT).show()
         }
         val btnRegister: Button = findViewById(R.id.logBtnRegister)
         btnRegister.setOnClickListener{
