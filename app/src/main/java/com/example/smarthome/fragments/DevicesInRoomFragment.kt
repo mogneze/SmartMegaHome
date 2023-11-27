@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,7 @@ import com.example.smarthome.R
 import com.example.smarthome.activities.roomsList
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -35,7 +37,9 @@ class DevicesInRoomFragment : Fragment() {
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
             bundle.putString("page", "device")
+            bundle.putInt("deviceId", deviceList[position].id)
             bundle.putString("deviceName", deviceList[position].name)
+            bundle.putString("deviceType", deviceList[position].type)
             bundle.putString("deviceParam1", deviceList[position].param1)
             bundle.putString("deviceParam2", deviceList[position].param2)
             bundle.putBoolean("deviceTurned", deviceList[position].isTurnedOn)
@@ -63,10 +67,9 @@ class DevicesInRoomFragment : Fragment() {
         val roomId = bundle!!.getInt("roomId")
         lifecycleScope.launch {
             try{
-                val devices = supabaseClient.postgrest["Devices"].select(){
-                    //фильтр по id комнаты
+                val devices = supabaseClient.postgrest["Devices"].select{
                     eq("room_id", roomId)
-                }.body.toString()//.decodeSingle<Client>()
+                }.body.toString()
 
                 val buf = StringBuilder()
                 buf.append(devices).append("\n");
@@ -75,7 +78,7 @@ class DevicesInRoomFragment : Fragment() {
                 for(i in 0..<root.length()){
                     val obj = root.getJSONObject(i)
                     val id = obj.getInt("id")
-                    val roomId = obj.getInt("room_id")
+                    //roomId чето да
                     val name = obj.getString("name")
                     val type = obj.getString("type")
                     val isTurned = obj.getBoolean("isTurnedOn")

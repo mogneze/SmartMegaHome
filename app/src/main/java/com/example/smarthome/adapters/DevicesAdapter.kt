@@ -9,6 +9,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smarthome.Device
 import com.example.smarthome.R
+import com.example.smarthome.TestSingleton
 
 class DevicesAdapter(private val list: ArrayList<Device>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DevicesAdapter.ViewHolder>() {
     interface ItemClickListener {
@@ -28,15 +29,35 @@ class DevicesAdapter(private val list: ArrayList<Device>, private val itemClickL
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentDevice: Device = list[position]
         holder.deviceName.text = currentDevice.name
-        holder.deviceParam1.text = currentDevice.param1
-        holder.deviceParam2.text = currentDevice.param2
+        holder.deviceParam2.visibility = View.GONE
         holder.deviceSwitch.isChecked = currentDevice.isTurnedOn
         when(currentDevice.type){
-            "light" -> holder.deviceImage.setImageResource(R.drawable.bulb_blue)
-            "fan" -> holder.deviceImage.setImageResource(R.drawable.fan_blue)
-            "hood" -> holder.deviceImage.setImageResource(R.drawable.hood_blue)
-            "temperature" -> holder.deviceImage.setImageResource(R.drawable.thermo_blue)
-            "conditioner" -> holder.deviceImage.setImageResource(R.drawable.condi_blue)
+            "light" -> {
+                holder.deviceImage.setImageResource(R.drawable.bulb_blue)
+                holder.deviceParam1.text = currentDevice.param1+"% яркость"
+            }
+            "fan" -> {
+                holder.deviceImage.setImageResource(R.drawable.fan_blue)
+                holder.deviceParam1.text = currentDevice.param1+"% мощность"
+            }
+            "hood" -> {
+                holder.deviceImage.setImageResource(R.drawable.hood_blue)
+                holder.deviceParam1.text = currentDevice.param1+"% мощность"
+            }
+            "temperature" -> {
+                holder.deviceImage.setImageResource(R.drawable.thermo_blue)
+                holder.deviceParam1.text = currentDevice.param1+"°C градусов"
+            }
+            "conditioner" -> {
+                holder.deviceImage.setImageResource(R.drawable.condi_blue)
+                holder.deviceParam2.visibility = View.VISIBLE
+                holder.deviceParam1.text = currentDevice.param1+"°C градусов"
+                holder.deviceParam2.text = currentDevice.param2+"% мощность"
+            }
+        }
+        holder.deviceSwitch.setOnCheckedChangeListener { _, _ ->
+            TestSingleton.updateDeviceState(currentDevice.id, !currentDevice.isTurnedOn)
+            currentDevice.isTurnedOn = !currentDevice.isTurnedOn
         }
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.smarthome.R
 import com.example.smarthome.Room
+import com.example.smarthome.TestSingleton
 import com.example.smarthome.adapters.RoomsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.github.jan.supabase.createSupabaseClient
@@ -114,6 +115,19 @@ class MainActivity : AppCompatActivity() {
             catch (e: Exception){
                 Log.e("!!!!!!!!!!!!", e.toString())
             }
+        }
+        lifecycleScope.launch {
+            try {
+                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+
+                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name","address")) {
+                    eq("id", user.id)
+                }.body.toString()
+                var array = JSONArray(n)
+                var obj = array.getJSONObject(0)
+                TestSingleton.username = obj.getString("name")
+                TestSingleton.userAddress = obj.getString("address")
+            }catch (e: Exception){Log.e("error", e.toString())}
         }
     }
 }

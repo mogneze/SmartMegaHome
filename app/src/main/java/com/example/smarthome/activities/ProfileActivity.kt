@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
+import com.example.smarthome.TestSingleton
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
@@ -27,7 +28,14 @@ class ProfileActivity : AppCompatActivity() {
         val usernameET: EditText = findViewById(R.id.profileUsernameText)
         val emailET: EditText = findViewById(R.id.profileEmailText)
         val addressET: EditText = findViewById(R.id.profileAddressText)
+
+        usernameET.setText(TestSingleton.username)
+        addressET.setText(TestSingleton.userAddress)
         lifecycleScope.launch {
+            val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+            emailET.setText(user.email)
+        }
+/*        lifecycleScope.launch {
             try {
                 val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
 
@@ -42,7 +50,7 @@ class ProfileActivity : AppCompatActivity() {
                 addressET.setText(address)
                 emailET.setText(user.email)
             }catch (e: Exception){Log.e("error", e.toString())}
-        }
+        }*/
 
         val btnBack: ImageButton = findViewById(R.id.btnBackFromProfile)
         btnBack.setOnClickListener {
@@ -63,6 +71,8 @@ class ProfileActivity : AppCompatActivity() {
                     user = supabaseClient.gotrue.modifyUser {
                         email = emailET.text.toString()
                     }
+                    TestSingleton.username = usernameET.text.toString()
+                    TestSingleton.userAddress = addressET.text.toString()
                     Toast.makeText(applicationContext, "Изменения сохранены", Toast.LENGTH_SHORT).show()
                 }catch (e: Exception){Log.e("error", e.toString())}
             }
