@@ -28,8 +28,8 @@ class DevicesAdapter(private val list: ArrayList<Device>, private val itemClickL
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentDevice: Device = list[position]
         holder.deviceName.text = currentDevice.name
-        holder.deviceParam1.text = currentDevice.param1.toString()
-        holder.deviceParam2.text = currentDevice.param2.toString()
+        holder.deviceParam1.text = currentDevice.param1
+        holder.deviceParam2.text = currentDevice.param2
         holder.deviceSwitch.isChecked = currentDevice.isTurnedOn
         when(currentDevice.type){
             "light" -> holder.deviceImage.setImageResource(R.drawable.bulb_blue)

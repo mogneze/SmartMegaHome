@@ -36,6 +36,9 @@ class DevicesInRoomFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("page", "device")
             bundle.putString("deviceName", deviceList[position].name)
+            bundle.putString("deviceParam1", deviceList[position].param1)
+            bundle.putString("deviceParam2", deviceList[position].param2)
+            bundle.putBoolean("deviceTurned", deviceList[position].isTurnedOn)
             val intent = Intent(activity, DetailsActivity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
@@ -75,10 +78,10 @@ class DevicesInRoomFragment : Fragment() {
                     val roomId = obj.getInt("room_id")
                     val name = obj.getString("name")
                     val type = obj.getString("type")
-                    //val isTurned = obj.getBoolean("isTurnedOn")
-/*                    val param1 = obj.getInt("param")
-                    val param2 = obj.getInt("param2")*/
-                    deviceList.add(Device(id, roomId, name, type, true, 1, 2))
+                    val isTurned = obj.getBoolean("isTurnedOn")
+                    val param1 = obj.getString("param")
+                    val param2 = obj.getString("param2")
+                    deviceList.add(Device(id, roomId, name, type, isTurned, param1, param2))
                 }
                 adapter.notifyDataSetChanged()
             }

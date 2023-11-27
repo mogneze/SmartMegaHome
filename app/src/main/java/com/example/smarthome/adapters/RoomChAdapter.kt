@@ -41,7 +41,7 @@ class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickLis
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)
             holder.roomName.setTextColor(Color.BLUE)
-            //holder.roomImage.
+            //holder.roomImage.colorFilter(R.color.black)
             // ААААААААААААААААААА БЛЯТЬ
         }
     }

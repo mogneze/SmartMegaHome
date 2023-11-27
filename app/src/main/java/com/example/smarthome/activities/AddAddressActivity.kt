@@ -41,6 +41,7 @@ class AddAddressActivity : AppCompatActivity() {
                             eq("id", user.id)
                         }
                         startActivity(intent)
+                        finish()
                     }catch (e: Exception){Log.e("error", e.toString())}
                 }
             }
