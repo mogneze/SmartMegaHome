@@ -1,14 +1,20 @@
 package com.example.smarthome.activities
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
 import com.example.smarthome.TestSingleton
@@ -16,11 +22,30 @@ import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
 
 class ProfileActivity : AppCompatActivity() {
+    companion object {
+    const val SHARED_PREFS = "shared_prefs"
+    const val EMAIL_KEY = "email_key"
+    const val PASSWORD_KEY = "password_key"
+}
+    private lateinit var sharedpreferences: SharedPreferences
+    private fun chooseImage(profileImage: ImageView){
+        try {
+            val selectImageIntent = registerForActivityResult(ActivityResultContracts.GetContent())
+            { uri ->
+                profileImage.setImageURI(uri)
+            }
+            selectImageIntent.launch("image/*")
+        }catch (e: Exception){
+            Toast.makeText(applicationContext, e.toString(), Toast.LENGTH_SHORT).show()
+            Log.e("erar", e.toString())
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -28,29 +53,33 @@ class ProfileActivity : AppCompatActivity() {
         val usernameET: EditText = findViewById(R.id.profileUsernameText)
         val emailET: EditText = findViewById(R.id.profileEmailText)
         val addressET: EditText = findViewById(R.id.profileAddressText)
+        val profileImage: ImageView = findViewById(R.id.imgProfilePic)
 
         usernameET.setText(TestSingleton.username)
         addressET.setText(TestSingleton.userAddress)
         lifecycleScope.launch {
-            val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-            emailET.setText(user.email)
-        }
-/*        lifecycleScope.launch {
-            try {
+            try{
                 val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
 
-                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name","address")) {
+                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("avatar")){
                     eq("id", user.id)
                 }.body.toString()
-                var array = JSONArray(n)
-                var obj = array.getJSONObject(0)
-                val username = obj.getString("name")
-                val address = obj.getString("address")
-                usernameET.setText(username)
-                addressET.setText(address)
                 emailET.setText(user.email)
-            }catch (e: Exception){Log.e("error", e.toString())}
-        }*/
+
+                val array = JSONArray(n)
+                val obj = array.getJSONObject(0)
+                val avatar = obj.getString("avatar")
+
+                val bucket = supabaseClient.storage["avatars"]
+                val bytes: ByteArray = bucket.downloadPublic(avatar)
+                val image: Drawable =
+                    BitmapDrawable(resources, BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
+                profileImage.setImageDrawable(image)
+            }catch (e: Exception){Log.e("er", e.toString()) }
+        }
+        profileImage.setOnClickListener{
+            chooseImage(profileImage)
+        }
 
         val btnBack: ImageButton = findViewById(R.id.btnBackFromProfile)
         btnBack.setOnClickListener {
@@ -84,7 +113,14 @@ class ProfileActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     supabaseClient.gotrue.logout(scope = LogoutScope.GLOBAL)
+
+                    sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+                    val editor = sharedpreferences.edit()
+                    editor.clear()
+                    editor.apply()
+
                     startActivity(intent)
+                    TestSingleton.mainActivity.finish()
                     finish()
                 }
                 catch (e: Exception){

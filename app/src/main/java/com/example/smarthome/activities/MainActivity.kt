@@ -22,10 +22,10 @@ import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
-private lateinit var refresher: SwipeRefreshLayout
 val roomsList: ArrayList<Room> = ArrayList()
 val supabaseClient = createSupabaseClient(
     supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
@@ -33,9 +33,10 @@ val supabaseClient = createSupabaseClient(
 ) {
     install(GoTrue)
     install(Postgrest)
+    install(Storage)
 }
 class MainActivity : AppCompatActivity() {
-    val act: Activity = this
+    private lateinit var refresher: SwipeRefreshLayout
     private val adapter = RoomsAdapter(roomsList, object : RoomsAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
@@ -51,8 +52,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        roomsList.clear()
         loadData()
-        val act: Activity = this;
+        TestSingleton.mainActivity = this
 
         val btnProfile: ImageButton = findViewById(R.id.btnSettings)
         btnProfile.setOnClickListener{
@@ -78,7 +80,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun loadData(){
-        //roomsList.clear()
         lifecycleScope.launch {
             try{
                 val addressText: TextView = findViewById(R.id.textAddress)
@@ -95,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
                 val rooms = supabaseClient.postgrest["Rooms"].select(){
                     eq("user_id", user.id)
-                }.body.toString()//.decodeSingle<Client>()
+                }.body.toString()
 
                 val buf = StringBuilder()
                 buf.append(rooms).append("\n");

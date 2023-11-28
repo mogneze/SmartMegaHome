@@ -1,6 +1,8 @@
 package com.example.smarthome.activities
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,16 +21,18 @@ import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.launch
 
 class LogInActivity : AppCompatActivity() {
-    val supabaseClient = createSupabaseClient(
-        supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttbWtxa2hzZ3B2eXlqdXJxc3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA0NjkyNzIsImV4cCI6MjAxNjA0NTI3Mn0.MovxaxcIm0z1cR6xuWpwvHgk1Y5i-q5AEKBqkm_Q304"
-    ) {
-        install(GoTrue)
-        install(Postgrest)
+    companion object {
+        const val SHARED_PREFS = "shared_prefs"
+        const val EMAIL_KEY = "email_key"
+        const val PASSWORD_KEY = "password_key"
     }
+
+    private lateinit var sharedpreferences: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
+
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
 
         val textEmail: EditText = findViewById(R.id.logEmail)
         val textPassword: EditText = findViewById(R.id.logPassword)
@@ -43,6 +47,11 @@ class LogInActivity : AppCompatActivity() {
                             email = textEmail.text.toString()
                             password = textPassword.text.toString()
                         }
+                        val editor = sharedpreferences.edit()
+                        editor.putString(EMAIL_KEY, textEmail.text.toString())
+                        editor.putString(PASSWORD_KEY, textPassword.text.toString())
+                        editor.apply()
+
                         startActivity(intent)
                         finish();
                     } catch (e: BadRequestRestException){

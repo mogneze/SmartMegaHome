@@ -32,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
                         password = textPassword.text.toString()
                     }
                     val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-                    val userAdd = User(user.id, textName.text.toString(), "")
+                    val userAdd = User(user.id, textName.text.toString(), "", "")
                     supabaseClient.postgrest["Users"].insert(userAdd)
 
                     startActivity(Intent(applicationContext, AddAddressActivity::class.java))
