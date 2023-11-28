@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,27 +15,18 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.smarthome.R
 import com.example.smarthome.Room
 import com.example.smarthome.TestSingleton
+import com.example.smarthome.TestSingleton.supabaseClient
+import com.example.smarthome.TestSingleton.user
 import com.example.smarthome.adapters.RoomsAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
 val roomsList: ArrayList<Room> = ArrayList()
-val supabaseClient = createSupabaseClient(
-    supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
-    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttbWtxa2hzZ3B2eXlqdXJxc3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA0NjkyNzIsImV4cCI6MjAxNjA0NTI3Mn0.MovxaxcIm0z1cR6xuWpwvHgk1Y5i-q5AEKBqkm_Q304"
-) {
-    install(GoTrue)
-    install(Postgrest)
-    install(Storage)
-}
+
 class MainActivity : AppCompatActivity() {
     private lateinit var refresher: SwipeRefreshLayout
     private val adapter = RoomsAdapter(roomsList, object : RoomsAdapter.ItemClickListener{
@@ -52,8 +44,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        roomsList.clear()
-        loadData()
         TestSingleton.mainActivity = this
 
         val btnProfile: ImageButton = findViewById(R.id.btnSettings)
@@ -74,25 +64,34 @@ class MainActivity : AppCompatActivity() {
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
 
-        refresher= findViewById(R.id.roomsRefresher)
-        refresher.setOnRefreshListener {
-            loadData()
-        }
+        refresher = findViewById(R.id.roomsRefresher)
+        refresher.setOnRefreshListener{ loadData() }
+    }
+    override fun onResume() {
+        super.onResume()
+        loadData()
     }
     private fun loadData(){
         lifecycleScope.launch {
             try{
-                val addressText: TextView = findViewById(R.id.textAddress)
+                //TestSingleton.getUserData()
+                roomsList.clear()
                 val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+                TestSingleton.user = user
 
-                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("address")){
+                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("address", "name")){
                     eq("id", user.id)
                 }.body.toString()
 
                 val array = JSONArray(n)
                 val obj = array.getJSONObject(0)
                 val address = obj.getString("address")
-                addressText.text = address
+                val name = obj.getString("name")
+                TestSingleton.userAddress = address
+                TestSingleton.username = name
+                val addressText: TextView = findViewById(R.id.textAddress)
+                if(address == "") addressText.text = "Адрес не указан"
+                else addressText.text = address
 
                 val rooms = supabaseClient.postgrest["Rooms"].select(){
                     eq("user_id", user.id)
@@ -110,25 +109,27 @@ class MainActivity : AppCompatActivity() {
                     val room = Room(id, name, type)
                     if(!roomsList.contains(room)) roomsList.add(room)
                 }
+                val txtLoading: TextView = findViewById(R.id.textLoading)
+                if(roomsList.isNotEmpty()) txtLoading.text = ""
+                else txtLoading.text = "У вас пока нет комнат.\nНажмите \"+\" чтобы добавить."
                 adapter.notifyDataSetChanged()
                 refresher.isRefreshing = false
             }
             catch (e: Exception){
-                Log.e("!!!!!!!!!!!!", e.toString())
+                Toast.makeText(applicationContext, "Произошла ошибка при загрузке", Toast.LENGTH_SHORT).show()
+                Log.e("Error loading main activity", e.toString())
             }
         }
-        lifecycleScope.launch {
-            try {
-                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-
-                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name","address")) {
-                    eq("id", user.id)
-                }.body.toString()
-                var array = JSONArray(n)
-                var obj = array.getJSONObject(0)
-                TestSingleton.username = obj.getString("name")
-                TestSingleton.userAddress = obj.getString("address")
-            }catch (e: Exception){Log.e("error", e.toString())}
-        }
+//        lifecycleScope.launch {
+//            try {
+//                val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("name","address")) {
+//                    eq("id", user.id)
+//                }.body.toString()
+//                var array = JSONArray(n)
+//                var obj = array.getJSONObject(0)
+//                TestSingleton.username = obj.getString("name")
+//                TestSingleton.userAddress = obj.getString("address")
+//            }catch (e: Exception){Log.e("error", e.toString())}
+//        }
     }
 }

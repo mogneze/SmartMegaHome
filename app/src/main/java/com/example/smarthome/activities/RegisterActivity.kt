@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
+import com.example.smarthome.TestSingleton.supabaseClient
 import com.example.smarthome.User
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email

@@ -6,10 +6,10 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
-import io.github.jan.supabase.exceptions.BadRequestRestException
+import com.example.smarthome.TestSingleton
+import com.example.smarthome.TestSingleton.supabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.launch

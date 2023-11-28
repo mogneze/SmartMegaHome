@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,23 +14,13 @@ import com.example.smarthome.activities.DetailsActivity
 import com.example.smarthome.Device
 import com.example.smarthome.adapters.DevicesAdapter
 import com.example.smarthome.R
-import com.example.smarthome.activities.roomsList
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.postgrest.Postgrest
+import com.example.smarthome.TestSingleton
+import com.example.smarthome.TestSingleton.supabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
 val deviceList: ArrayList<Device> = ArrayList()
-val supabaseClient = createSupabaseClient(
-    supabaseUrl = "https://kmmkqkhsgpvyyjurqstn.supabase.co",
-    supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttbWtxa2hzZ3B2eXlqdXJxc3RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA0NjkyNzIsImV4cCI6MjAxNjA0NTI3Mn0.MovxaxcIm0z1cR6xuWpwvHgk1Y5i-q5AEKBqkm_Q304"
-) {
-    install(GoTrue)
-    install(Postgrest)
-}
 class DevicesInRoomFragment : Fragment() {
     private val adapter = DevicesAdapter(deviceList, object : DevicesAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
@@ -46,9 +35,6 @@ class DevicesInRoomFragment : Fragment() {
             val intent = Intent(activity, DetailsActivity::class.java)
             intent.putExtras(bundle)
             startActivity(intent)
-            //DetailsActivity().replaceFragment(AddRoomFragment())
-            //val bundle = Bundle()
-            //findNavController(R.id.nav_graph).navigate(R.id.deviceFragment, bundle)
         }
     })
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,6 +48,12 @@ class DevicesInRoomFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        TestSingleton.DevicesInRoomFragment = this
+        loadDevices()
+
+        return inflater.inflate(R.layout.fragment_devices_in_room, container, false)
+    }
+    fun loadDevices(){
         deviceList.clear()
         val bundle = arguments
         val roomId = bundle!!.getInt("roomId")
@@ -84,14 +76,14 @@ class DevicesInRoomFragment : Fragment() {
                     val isTurned = obj.getBoolean("isTurnedOn")
                     val param1 = obj.getString("param")
                     val param2 = obj.getString("param2")
-                    deviceList.add(Device(id, roomId, name, type, isTurned, param1, param2))
+                    val identifier = obj.getString("identifier")
+                    deviceList.add(Device(id, roomId, name, type, isTurned, param1, param2, identifier))
                 }
                 adapter.notifyDataSetChanged()
             }
             catch (e: Exception){
-                Log.e("!!!!!!!!!!!!", e.toString())
+                Log.e("DeviceList loading error", e.toString())
             }
         }
-        return inflater.inflate(R.layout.fragment_devices_in_room, container, false)
     }
 }

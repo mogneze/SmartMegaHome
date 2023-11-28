@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.Device
 import com.example.smarthome.R
 import com.example.smarthome.TestSingleton
+import com.example.smarthome.TestSingleton.supabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 
@@ -41,7 +42,7 @@ class DeviceSettingsFragment : Fragment() {
         deviceSwitch.isChecked = device.isTurnedOn
         when(device.type){
             "light" ->{
-                param1Name = " яркость"
+                param1Name = "% яркость"
                 deviceImage.setImageResource(R.drawable.bulb_blue)
             }
             "conditioner" ->{
@@ -97,7 +98,7 @@ class DeviceSettingsFragment : Fragment() {
         val deviceTurned = bundle.getBoolean("deviceTurned")
         val deviceParam1 = bundle.getString("deviceParam1").toString()
         val deviceParam2 = bundle.getString("deviceParam2").toString()
-        device = Device(deviceId, 0, deviceName, deviceType, deviceTurned, deviceParam1, deviceParam2)
+        device = Device(deviceId, 0, deviceName, deviceType, deviceTurned, deviceParam1, deviceParam2, "")
         lifecycleScope.launch {
             try{
             }catch (e: Exception) { Log.e("error", e.toString())}
@@ -108,7 +109,7 @@ class DeviceSettingsFragment : Fragment() {
     private fun updateDevice(){
         lifecycleScope.launch {
             try {
-                com.example.smarthome.activities.supabaseClient.postgrest["Devices"].update({
+                supabaseClient.postgrest["Devices"].update({
                     set("isTurnedOn", deviceSwitch.isChecked)
                     set("param", deviceParam1Bar.progress)
                     set("param2", deviceParam2Bar.progress)

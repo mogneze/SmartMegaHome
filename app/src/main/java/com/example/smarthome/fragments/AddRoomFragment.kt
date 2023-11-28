@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.smarthome.R
 import com.example.smarthome.Room
 import com.example.smarthome.RoomAdd
+import com.example.smarthome.TestSingleton.supabaseClient
 import com.example.smarthome.adapters.RoomChAdapter
 import com.example.smarthome.roomType
 import io.github.jan.supabase.gotrue.gotrue
@@ -62,9 +63,9 @@ class AddRoomFragment : Fragment() {
         }
         lifecycleScope.launch {
             try {
-                val user = com.example.smarthome.activities.supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
+                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
                 val room = RoomAdd(user.id, roomName.text.toString(), roomType)
-                com.example.smarthome.activities.supabaseClient.postgrest["Rooms"].insert(room)
+                supabaseClient.postgrest["Rooms"].insert(room)
                 Toast.makeText(context, "Сохранено", Toast.LENGTH_SHORT).show()
                 activity?.finish()
             } catch (e: Exception) {

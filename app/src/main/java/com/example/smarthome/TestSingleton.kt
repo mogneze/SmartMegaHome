@@ -1,17 +1,26 @@
 package com.example.smarthome
 
 import android.util.Log
+import android.widget.Adapter
+import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.activities.MainActivity
-import com.example.smarthome.activities.supabaseClient
+import com.example.smarthome.activities.roomsList
+import com.example.smarthome.adapters.RoomsAdapter
+import com.example.smarthome.fragments.DevicesInRoomFragment
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 
 object TestSingleton {
     val supabaseClient = createSupabaseClient(
@@ -25,12 +34,10 @@ object TestSingleton {
     fun getClient(): SupabaseClient {
         return supabaseClient
     }
-    fun TestSingleton(){
-        GlobalScope.launch {
-            val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-        }
-    }
+
     lateinit var mainActivity: MainActivity
+    lateinit var DevicesInRoomFragment: DevicesInRoomFragment
+    lateinit var user: UserInfo
     var username: String = ""
     var userAddress: String = ""
     fun updateDeviceState(deviceId: Int, isTurned: Boolean){
@@ -53,6 +60,7 @@ object TestSingleton {
                     set("param", param1)
                     set("param2", param2)
                 }){ eq("id", deviceId)}
+                DevicesInRoomFragment.loadDevices()
             }
             catch (e: Exception){
                 Log.e("шмяк", e.toString())

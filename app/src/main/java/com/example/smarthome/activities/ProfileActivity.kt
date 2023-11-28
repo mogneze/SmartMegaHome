@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.smarthome.R
 import com.example.smarthome.TestSingleton
+import com.example.smarthome.TestSingleton.supabaseClient
+import com.example.smarthome.TestSingleton.user
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
@@ -57,14 +59,12 @@ class ProfileActivity : AppCompatActivity() {
 
         usernameET.setText(TestSingleton.username)
         addressET.setText(TestSingleton.userAddress)
+        emailET.setText(user.email)
         lifecycleScope.launch {
             try{
-                val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
-
                 val n = supabaseClient.postgrest["Users"].select(columns = Columns.list("avatar")){
                     eq("id", user.id)
                 }.body.toString()
-                emailET.setText(user.email)
 
                 val array = JSONArray(n)
                 val obj = array.getJSONObject(0)
@@ -75,7 +75,7 @@ class ProfileActivity : AppCompatActivity() {
                 val image: Drawable =
                     BitmapDrawable(resources, BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
                 profileImage.setImageDrawable(image)
-            }catch (e: Exception){Log.e("er", e.toString()) }
+            }catch (e: Exception){Log.e("Error loading avatar", e.toString()) }
         }
         profileImage.setOnClickListener{
             chooseImage(profileImage)
