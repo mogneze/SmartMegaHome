@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Adapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -25,13 +26,6 @@ import kotlinx.coroutines.launch
 class AddRoomFragment : Fragment() {
     private val roomsList: ArrayList<Room> = ArrayList()
     var roomType: String = ""
-    private val adapter = RoomChAdapter(roomsList, object : RoomChAdapter.ItemClickListener{
-        override fun onItemClick(position: Int) {
-            Toast.makeText(context, roomsList[position].type, Toast.LENGTH_SHORT).show()
-            roomType=roomsList[position].type
-            roomsList[position]
-        }
-    })
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -50,7 +44,13 @@ class AddRoomFragment : Fragment() {
 
         val recycler: RecyclerView = view.findViewById(R.id.chooseRoomRecycle)
         recycler.layoutManager = GridLayoutManager(context, 3)
-        recycler.adapter = adapter
+        recycler.adapter = RoomChAdapter(roomsList, object : RoomChAdapter.ItemClickListener{
+            override fun onItemClick(position: Int) {
+                Toast.makeText(context, roomsList[position].type, Toast.LENGTH_SHORT).show()
+                roomType=roomsList[position].type
+                roomsList[position]
+            }
+        }, requireActivity().applicationContext)
     }
     private fun addRoom(roomName: EditText){
         if(roomName.text.toString() == ""){

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,7 @@ import org.json.JSONArray
 
 val deviceList: ArrayList<Device> = ArrayList()
 class DevicesInRoomFragment : Fragment() {
+    lateinit var txtLoading: TextView
     private val adapter = DevicesAdapter(deviceList, object : DevicesAdapter.ItemClickListener{
         override fun onItemClick(position: Int) {
             val bundle = Bundle()
@@ -40,6 +42,7 @@ class DevicesInRoomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        txtLoading = view.findViewById(R.id.textLoadingDevices)
         val recycler: RecyclerView = view.findViewById(R.id.devicesRecycle)
         recycler.layoutManager = GridLayoutManager(context, 2)
         recycler.adapter = adapter
@@ -79,6 +82,8 @@ class DevicesInRoomFragment : Fragment() {
                     val identifier = obj.getString("identifier")
                     deviceList.add(Device(id, roomId, name, type, isTurned, param1, param2, identifier))
                 }
+                if(deviceList.isNotEmpty()) txtLoading.text = ""
+                else txtLoading.text = "У вас пока нет устройств в этой комнате.\nНажмите \"+\" чтобы добавить."
                 adapter.notifyDataSetChanged()
             }
             catch (e: Exception){

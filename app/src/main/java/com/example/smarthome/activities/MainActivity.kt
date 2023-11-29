@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try{
                 //TestSingleton.getUserData()
-                roomsList.clear()
+                //roomsList.clear()
                 val user = supabaseClient.gotrue.retrieveUserForCurrentSession(updateSession = true)
                 TestSingleton.user = user
 

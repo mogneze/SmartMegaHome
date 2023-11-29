@@ -1,5 +1,6 @@
 package com.example.smarthome.adapters
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -7,15 +8,17 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smarthome.R
 import com.example.smarthome.Room
 
-class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<RoomChAdapter.ViewHolder>() {
+class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickListener: ItemClickListener, private val context: Context) : RecyclerView.Adapter<RoomChAdapter.ViewHolder>() {
     interface ItemClickListener {
         fun onItemClick(position: Int){
         }
     }
+    private var pos: Int = 0
 
     @ColorInt
     val MAGENTA = -0xffff01
@@ -38,9 +41,21 @@ class RoomChAdapter (private val list: ArrayList<Room>, private val itemClickLis
             "bedroom" -> holder.roomImage.setImageResource(R.drawable.bedroom_white)
             "hall" -> holder.roomImage.setImageResource(R.drawable.hall_white)
         }
+        val on = ContextCompat.getColor(context, R.color.blue_primary)
+        val off = ContextCompat.getColor(context, R.color.light_grey)
+        if(position == pos){
+            holder.roomName.setTextColor(on)
+            holder.roomImage.setColorFilter(on)
+        }
+        else{
+            holder.roomName.setTextColor(off)
+            holder.roomImage.setColorFilter(off)
+        }
         holder.itemView.setOnClickListener(){
             itemClickListener.onItemClick(position)
-            holder.roomName.setTextColor(Color.BLUE)
+            pos = position
+            notifyDataSetChanged()
+            //holder.roomName.setTextColor(Color.BLUE)
             //holder.roomImage.colorFilter(R.color.black)
             // ААААААААААААААААААА БЛЯТЬ
         }

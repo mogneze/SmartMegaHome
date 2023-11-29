@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.smarthome.R
 import com.example.smarthome.fragments.AddRoomFragment
-import com.example.smarthome.fragments.DeviceFragment
 import com.example.smarthome.fragments.DeviceSettingsFragment
 import com.example.smarthome.fragments.DevicesInRoomFragment
 
